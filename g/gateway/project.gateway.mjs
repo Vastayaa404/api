@@ -6,7 +6,7 @@ import cote from 'cote';
 const fastify = Fastify();
 const weatherService = new cote.Requester({ name: 'weather-service', namespace: 'weather' });
 
-fastify.post('/weather', async (req, res) => { const r = await new Promise(resolve => weatherService.send({ type: 'getWeather', body: req.body.city }, resolve)); res.send(r) });
+fastify.post('/weather', async (req, res) => { const r = await new Promise(resolve => weatherService.send({ type: 'getWeather', params: { body: req.body.city } }, resolve)); res.send(r) });
 
 // Activate =======================================================================================================================>
-fastify.listen({ port: 5002 }, (err, address) => { if (err) throw err });
+fastify.listen({ port: 5002 }, (err, address) => { if (err) throw err; console.log('Project Gateway Started') });

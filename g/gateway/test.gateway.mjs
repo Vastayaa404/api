@@ -11,4 +11,4 @@ console.log(`Получил ответ от statusService: ${JSON.stringify(r)},
 res.send(r) });
 
 // Activate =======================================================================================================================>
-fastify.listen({ port: 5010 }, (err, address) => { if (err) throw err });
+fastify.listen({ port: 5010 }, (err, address) => { if (err) throw err; console.log('Dev Gateway Started') });
