@@ -1,10 +1,10 @@
 {
-  "name": "c",
+  "name": "core",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "core/core.mjs",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node core/core.mjs"
   },
   "keywords": [],
   "author": "",
