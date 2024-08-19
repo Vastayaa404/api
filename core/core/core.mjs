@@ -1,19 +1,22 @@
-// Import all dependencies ========================================================================================================>
+// Import all dependencies ======================================================================================================================================================================================================>
 import Fastify from 'fastify';
+import cluster from 'cluster';
+import { cpus, totalmem, freemem } from 'os';
 import cors from '@fastify/cors';
 import proxy from '@fastify/http-proxy';
 import { corsConfig, headersConfig } from './core.config.mjs';
 
-// Logic ==========================================================================================================================>
-const port = process.env.PORT
-const fastify = Fastify({logger: true});
-fastify.addHook('onRequest', headersConfig).register(cors, corsConfig)
-.register(proxy, { upstream: 'http://localhost:5001', prefix: '/auth' }) // To auth gateway
-.register(proxy, { upstream: 'http://localhost:5002', prefix: '/services' }) // To project gateway
-.register(proxy, { upstream: 'http://localhost:5010', prefix: '/dev' }) // To dev (test) gateway
-
-fastify.get('/', async (req, res) => { res.send('All ok, im fastify!') });
-fastify.get('/status', async (req, res) => { res.send(`headers: ${req.headers}, all ok, no proxy`) });
-
-// Activate =======================================================================================================================>
-fastify.listen({ host: '127.0.0.1', port: port }, (err, address) => { if (err) throw err; console.log(`Core Started on address ${address}`) });
+// Module =======================================================================================================================================================================================================================>
+if (cluster.isPrimary) {
+  const numCPUs = cpus().length;
+  for (let i = 0; i < 4/*numCPUs*/; i++) cluster.fork();
+  console.log(`${(totalmem() / (1024 * 1024 * 1024)).toFixed(2)} GB RAM detected\n${(freemem() / (1024 * 1024 * 1024)).toFixed(2)} GB RAM available`); // RAM on device / available RAM
+  cluster.on('exit', (worker) => console.log(`cluster ${worker.process.pid} died`));
+} else {
+  const fastify = Fastify();
+  fastify.addHook('onRequest', headersConfig).register(cors, corsConfig)
+  .register(proxy, { upstream: 'http://localhost:5020', prefix: '/auth' }) // To auth gateway
+  .register(proxy, { upstream: 'http://localhost:5040', prefix: '/services' }) // To project gateway
+  .register(proxy, { upstream: 'http://localhost:5060', prefix: '/dev' }) // To dev (test) gateway
+  fastify.listen({ port: 5000 }, (err, address) => { if (err) throw err; console.log(`Core Started`) });
+};
