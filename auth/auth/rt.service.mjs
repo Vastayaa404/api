@@ -4,46 +4,21 @@ import db from '../../db_auth/models/index.mjs';
 const Token = db.token;
 
 // Module =======================================================================================================================================================================================================================>
-const refreshTokensService = new cote.Responder({ name: 'refresh-tokens-service', namespace: 'refresh-tokens' });
+const rt = new cote.Responder({ name: 'refresh-tokens-service', namespace: 'refresh-tokens' });
+const ct = new cote.Requester({ name: 'create-token-service', namespace: 'create-token' }); // ct.service
 
-//try { db.sequelize.sync() } catch (e) { console.error(`Error while sync/connect to db: ${e}`) };
-
-// db.sequelize.sync({force: true}).then(() => {
-//     console.log('Drop and Resync Db');
-//     initial();
-// });
-// function initial() {
-//     db.role.create({
-//       id: 1,
-//       name: "user"
-//     });
-   
-//     db.role.create({
-//       id: 2,
-//       name: "moderator"
-//     });   
-//     db.role.create({
-//       id: 3,
-//       name: "admin"
-//     });
-// }
-
-refreshTokensService.on('refreshTokens', async (req, cb) => {
+rt.on('refreshTokens', async (req, cb) => {
   try {
-    console.log(`Пришедший токен: ${req.params.cookies.refreshToken}`)
-    const token = await Token.findOne({ where: { token: req.params.cookies.refreshToken } });
-    //const { userId, username } = token;
-    const user = { id: userId, user: username };
-    console.log(`Токен в бд: ${token}`)
-    //const { accessToken, refreshToken } = authJwt.createToken(user);
+    const token = await Token.findOne({ where: { token: req.params.cookies.rt } }); if (!token) throw new Error('Bad token');
+    const { userId, username } = token;
+    const user = { id: userId, username: username };
 
-    //await Token.destroy({ where: { token: req.cookies.refreshToken } });
-    //await Token.create({ userId: user.id, username: user.user, token: refreshToken });
+    const r = await new Promise(resolve => ct.send({ type: 'createToken', params: { user: user } }, resolve)); if (r.error) throw new Error(r.error);
+    const { accessToken, refreshToken } = r;
 
-    //res.cookie('refreshToken', refreshToken, { maxAge: 1000*60*60*24, httpOnly: true, secure: true });
-    //res.status(200).send({ accessToken: accessToken });
-  } catch (e) { cb({ error: 'Invalid token' }) };
+    await Token.destroy({ where: { token: req.params.cookies.rt } });
+    await Token.create({ userId: user.id, username: user.username, token: refreshToken });
 
-  console.log(`Возврат значения, \n${req.params.cookies.refreshToken}`);
-  cb('Hello2')
+    cb({ accessToken: accessToken, refreshToken: refreshToken })
+  } catch (e) { cb({ error: e.message }) };
 });
