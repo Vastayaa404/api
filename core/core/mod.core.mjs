@@ -1,10 +1,10 @@
 // Import all dependencies ======================================================================================================================================================================================================>
 import Fastify from 'fastify';
-import cluster from 'cluster';
-import { cpus, totalmem, freemem } from 'os';
 import cors from '@fastify/cors';
 import proxy from '@fastify/http-proxy';
-import { corsConfig, headersConfig } from './core.config.mjs';
+import cluster from 'cluster';
+import { cpus, totalmem, freemem } from 'os';
+import { corsConfig, headersConfig } from './conf.core.mjs';
 
 // Module =======================================================================================================================================================================================================================>
 if (cluster.isPrimary) {

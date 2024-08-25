@@ -1,17 +1,15 @@
 // Import all dependencies ======================================================================================================================================================================================================>
 import Fastify from 'fastify';
 import cote from 'cote';
-import { testHeadersConfig } from './_gateway.config.mjs';
+import { projectHeadersConfig } from './conf.gateway.mjs';
 
 // Module =======================================================================================================================================================================================================================>
 const fastify = Fastify();
-fastify.addHook('onRequest', testHeadersConfig);
+fastify.addHook('onRequest', projectHeadersConfig);
 
-const statusService = new cote.Requester({ name: 'status-service', namespace: 'status' })
+const weatherService = new cote.Requester({ name: 'weather-service', namespace: 'weather' });
 
-fastify.get('/status', async (req, res) => { const r = await new Promise(resolve => statusService.send({ type: 'getStatus' }, resolve));
-console.log(`Получил ответ от statusService: ${JSON.stringify(r)}, test completed`);
-res.send(r) });
+fastify.post('/weather', async (req, res) => { const r = await new Promise(resolve => weatherService.send({ type: 'getWeather', params: { body: req.body.city } }, resolve)); res.send(r) });
 
 // Activate =====================================================================================================================================================================================================================>
-fastify.listen({ port: 5060 }, (err, address) => { if (err) throw err; console.log('Dev Gateway Started') });
+fastify.listen({ port: 5040 }, (err, address) => { if (err) throw err; console.log('Project Gateway Started') });

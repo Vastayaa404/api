@@ -11,22 +11,19 @@ const ct = new cote.Requester({ name: 'create-token-service', namespace: 'create
 
 si.on('signIn', async (req, cb) => {
   try {
-    if (!req.params.body || !req.params.body.username || !req.params.body.password) { throw new Error("DTO not found") };
+    if (!req.params.body) throw new Error("No Data Detected. Aborting")
+    const { username, password } = req.params.body;
+    if (!username || !password) throw new Error("DTO not found");
 
-    const user = await User.findOne({ where: { username: req.params.body.username } });
-    if (!user) { throw new Error("Invalid Username or Password") };
+    const user = await User.findOne({ where: { username } });
+    if (!user || !(await bcrypt.compare(password, user.password))) { throw new Error("Invalid Username or Password") };
+    if (user.isBanned === "true") throw new Error("Your account has been deactivated.");
 
-    const passwordIsValid = await bcrypt.compare(req.params.body.password, user.password);
-    if (!passwordIsValid) { throw new Error("Invalid Username or Password") };
-
-    if (user.isBanned === 'true') { throw new Error("Your account has been deactivated.") }
-
-    const r = await new Promise(resolve => ct.send({ type: 'createToken', params: { user: user } }, resolve)); if (r.error) throw new Error(r.error);
+    const r = await new Promise(resolve => ct.send({ type: 'createToken', params: { user } }, resolve)); if (r.error) throw new Error(r.error);
     const { accessToken, refreshToken } = r;
-    const token = await Token.findOne({ where: { username: req.params.body.username } });
-    if (token) { await Token.destroy({ where: { username: req.params.body.username } }) };
-    await Token.create({ userId: user.id, username: user.username, token: refreshToken });
-    
-    cb({ username: user.username, accessToken: accessToken, refreshToken: refreshToken });
+    await Token.destroy({ where: { username } });
+    await Token.create({ userId: user.id, username, token: refreshToken });
+
+    cb({ username, accessToken, refreshToken });
   } catch (e) { cb({ error: e.message }) };
 });

@@ -12,7 +12,6 @@
   "description": "",
   "dependencies": {
     "@fastify/cookie": "^9.3.1",
-    "@fastify/middie": "^8.3.1",
     "cote": "^1.1.0",
     "fastify": "^4.28.1"
   }
