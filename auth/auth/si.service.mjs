@@ -7,7 +7,7 @@ const User = db.user;
 
 // Module =======================================================================================================================================================================================================================>
 const si = new cote.Responder({ name: 'signin-service', namespace: 'signin' });
-const ct = new cote.Requester({ name: 'create-token-service', namespace: 'create-token' }); // ct.service
+const ct = new cote.Requester({ name: 'create-token-service', namespace: 'create-token', timeout: 10000 }); // ct.service
 
 si.on('signIn', async (req, cb) => {
   try {

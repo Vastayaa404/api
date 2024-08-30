@@ -7,9 +7,9 @@ import { testHeadersConfig } from './conf.gateway.mjs';
 const fastify = Fastify();
 fastify.addHook('onRequest', testHeadersConfig);
 
-const statusService = new cote.Requester({ name: 'status-service', namespace: 'status' })
+const ss = new cote.Requester({ name: 'status-service', namespace: 'status', timeout: 10000 })
 
-fastify.get('/status', async (req, res) => { const r = await new Promise(resolve => statusService.send({ type: 'getStatus' }, resolve));
+fastify.get('/status', async (req, res) => { const r = await new Promise(resolve => ss.send({ type: 'getStatus' }, resolve));
 console.log(`Получил ответ от statusService: ${JSON.stringify(r)}, test completed`);
 res.send(r) });
 

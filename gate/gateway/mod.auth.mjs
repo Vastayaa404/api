@@ -5,13 +5,13 @@ import cote from 'cote';
 import { authHeadersConfig } from './conf.gateway.mjs';
 
 // Module =======================================================================================================================================================================================================================>
-const vrt = new cote.Requester({ name: 'verify-refresh-token-service', namespace: 'verify-refresh-token' }); // vrt.service
-const rt = new cote.Requester({ name: 'refresh-tokens-service', namespace: 'refresh-tokens' }); // rt.service
+const vrt = new cote.Requester({ name: 'verify-refresh-token-service', namespace: 'verify-refresh-token', timeout: 10000 }); // vrt.service
+const rt = new cote.Requester({ name: 'refresh-tokens-service', namespace: 'refresh-tokens', timeout: 10000 }); // rt.service
 
-const cdv = new cote.Requester({ name: 'check-data-is-valid-service', namespace: 'check-data-is-valid' }); // cdv.service
-const su = new cote.Requester({ name: 'signup-service', namespace: 'signup' }); // su.service (signup)
-const si = new cote.Requester({ name: 'signin-service', namespace: 'signin' }); // si.service (signin)
-const sal = new cote.Requester({ name: 'send-activate-link-service', namespace: 'send-activate-link' }); // sal.service (sendactivatelink)
+const cdv = new cote.Requester({ name: 'check-data-is-valid-service', namespace: 'check-data-is-valid', timeout: 10000 }); // cdv.service
+const su = new cote.Requester({ name: 'signup-service', namespace: 'signup', timeout: 10000 }); // su.service (signup)
+const si = new cote.Requester({ name: 'signin-service', namespace: 'signin', timeout: 10000 }); // si.service (signin)
+const sal = new cote.Requester({ name: 'send-activate-link-service', namespace: 'send-activate-link', timeout: 10000 }); // sal.service (sendactivatelink)
 
 const fastify = Fastify();
 fastify.addHook('onRequest', authHeadersConfig)

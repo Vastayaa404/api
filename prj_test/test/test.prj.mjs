@@ -2,9 +2,9 @@
 import cote from 'cote';
 
 // Module =======================================================================================================================================================================================================================>
-const statusService = new cote.Responder({ name: 'status-service', namespace: 'status' });
+const ss = new cote.Responder({ name: 'status-service', namespace: 'status' });
 
-statusService.on('getStatus', async (body, cb) => {
+ss.on('getStatus', async (body, cb) => {
   console.log('Получил запрос на получение status');
   const result = await new Promise((resolve, reject) => {
     setTimeout(() => {

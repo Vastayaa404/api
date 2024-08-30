@@ -5,7 +5,7 @@ const Token = db.token;
 
 // Module =======================================================================================================================================================================================================================>
 const rt = new cote.Responder({ name: 'refresh-tokens-service', namespace: 'refresh-tokens' });
-const ct = new cote.Requester({ name: 'create-token-service', namespace: 'create-token' }); // ct.service
+const ct = new cote.Requester({ name: 'create-token-service', namespace: 'create-token', timeout: 10000 }); // ct.service
 
 rt.on('refreshTokens', async (req, cb) => {
   try {
